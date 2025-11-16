@@ -31,9 +31,9 @@ spec:
             - secretRef:
                 name: zero-downtime-secrets
   strategy:
-    canary:
-      stableService: zero-downtime-app-stable   # <-- required
-      canaryService: zero-downtime-app         # <-- required
+  canary:
+    stableService: zero-downtime-app-stable
+    canaryService: zero-downtime-app
       steps:
         - setWeight: 20
         - pause: {duration: 60s}
