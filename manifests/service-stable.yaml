@@ -6,8 +6,8 @@ metadata:
     app: zero-downtime-app
 spec:
   ports:
-    - name: http
-      port: 80
-      targetPort: 8080
+    - port: 80
+      targetPort: 8081  # make sure this is a different port than your main app
   selector:
     app: zero-downtime-app
+
