@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: success-rate
+spec:
+  metrics:
+    - name: success-rate
+      interval: 30s
+      successCondition: result >= 90
+      failureCondition: result < 90
+      provider:
+        prometheus:
+          query: |
+            sum(rate(http_requests_total{job="zero-downtime-app",status=~"2.."}[1m])) 
+            / sum(rate(http_requests_total{job="zero-downtime-app"}[1m])) * 100
