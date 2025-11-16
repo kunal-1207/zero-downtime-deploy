@@ -5,30 +5,25 @@ metadata:
   namespace: argocd
 spec:
   project: default
-  
-  # Source of the application manifests
+
   source:
-    repoURL: https://github.com/example/zero-downtime-deployment.git
+    repoURL: https://github.com/kunal-1207/zero-downtime-deploy.git
     targetRevision: HEAD
     path: manifests
-    
-  # Destination cluster and namespace to deploy the application
+
   destination:
     server: https://kubernetes.default.svc
-    namespace: staging
-    
-  # Sync policy
+    namespace: default
+
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      
-    # Retry sync if it fails
     retry:
       limit: 5
       backoff:
         duration: 5s
         factor: 2
-        maxDuration: 3m0s
+        maxDuration: 3m
