@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: zero-downtime-app
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - istio-system/ingressgateway
+  http:
+    - route:
+        - destination:
+            host: zero-downtime-app
+            port:
+              number: 80
+          weight: 0
+        - destination:
+            host: zero-downtime-app-stable
+            port:
+              number: 80
+          weight: 100
