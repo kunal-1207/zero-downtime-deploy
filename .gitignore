@@ -1,0 +1,5 @@
+# kubernetes manifests / generated files
+*.local
+*.cache
+*.log
+.env
