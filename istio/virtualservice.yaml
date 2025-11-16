@@ -1,20 +1,27 @@
+# manifests/virtualservice.yaml
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: zero-downtime-app
 spec:
   hosts:
-    - "app.example.com"
+    - "*"
   gateways:
-    - zero-downtime-gateway
+    - istio-system/your-gateway  # replace with your gateway name
   http:
-    - name: "primary"
+    - name: "zero-downtime-app-canary"
+      match:
+        - headers:
+            end-user:
+              exact: "canary"  # optional header-based routing
       route:
         - destination:
             host: zero-downtime-app
-            subset: stable
-          weight: 100
+            port:
+              number: 80
+          weight: 0  # Argo Rollouts will manage this
         - destination:
-            host: zero-downtime-app
-            subset: canary
-          weight: 0
+            host: zero-downtime-app-stable
+            port:
+              number: 80
+          weight: 100  # Argo Rollouts manages incremental traffic
