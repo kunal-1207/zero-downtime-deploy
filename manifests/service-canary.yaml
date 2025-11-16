@@ -1,0 +1,13 @@
+# manifests/service-canary.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: zero-downtime-app-canary
+  labels:
+    app: zero-downtime-app
+spec:
+  ports:
+    - port: 80
+      targetPort: 8082
+  selector:
+    app: zero-downtime-app

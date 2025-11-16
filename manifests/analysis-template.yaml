@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: success-rate
+  namespace: default
+spec:
+  metrics:
+    - name: success-rate
+      interval: 30s
+      successCondition: result > 95
+      failureCondition: result < 95
+      provider:
+        prometheus:
+          address: http://prometheus.default.svc:9090
+          query: |
+            sum(rate(http_requests_total{app="zero-downtime-app",status!~"5.."}[1m]))
+            /
+            sum(rate(http_requests_total{app="zero-downtime-app"}[1m])) * 100
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: latency
+  namespace: default
+spec:
+  metrics:
+    - name: latency
+      interval: 30s
+      successCondition: result < 200
+      failureCondition: result > 500
+      provider:
+        prometheus:
+          address: http://prometheus.default.svc:9090
+          query: |
+            histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{app="zero-downtime-app"}[1m])) by (le))

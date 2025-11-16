@@ -4,21 +4,15 @@ metadata:
   name: zero-downtime-app-hpa
 spec:
   scaleTargetRef:
-    apiVersion: argoproj.io/v1alpha1
+    apiVersion: apps/v1
     kind: Rollout
     name: zero-downtime-app
-  minReplicas: 3
-  maxReplicas: 10
+  minReplicas: 2
+  maxReplicas: 5
   metrics:
     - type: Resource
       resource:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: 70
-    - type: Resource
-      resource:
-        name: memory
-        target:
-          type: Utilization
-          averageUtilization: 80
+          averageUtilization: 50

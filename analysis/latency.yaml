@@ -1,0 +1,14 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: latency
+spec:
+  metrics:
+    - name: request-latency
+      interval: 30s
+      successCondition: result < 500
+      failureCondition: result >= 500
+      provider:
+        prometheus:
+          query: |
+            histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job="zero-downtime-app"}[1m])) by (le))
