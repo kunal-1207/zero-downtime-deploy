@@ -3,16 +3,4 @@ kind: ConfigMap
 metadata:
   name: zero-downtime-config
 data:
-  # Application configuration
-  APP_ENV: production
-  LOG_LEVEL: info
-  MAX_CONNECTIONS: "100"
-  
-  # Database configuration
-  DB_HOST: postgres-db.example.com
-  DB_PORT: "5432"
-  DB_NAME: app_db
-  
-  # Redis configuration
-  REDIS_HOST: redis-cache.example.com
-  REDIS_PORT: "6379"
+  SAMPLE_ENV: "value"
