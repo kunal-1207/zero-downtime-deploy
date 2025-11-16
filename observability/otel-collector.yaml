@@ -1,0 +1,47 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: zero-downtime-otel-collector
+spec:
+  mode: deployment
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+      
+      jaeger:
+        protocols:
+          grpc:
+          thrift_http:
+      
+      zipkin:
+        endpoint: 0.0.0.0:9411
+    
+    processors:
+      batch:
+    
+    exporters:
+      otlp/jaeger:
+        endpoint: jaeger-collector:14250
+        tls:
+          insecure: true
+      
+      prometheus:
+        endpoint: "0.0.0.0:8889"
+        namespace: "zero_downtime_app"
+        const_labels:
+          label1: value1
+    
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp, jaeger, zipkin]
+          processors: [batch]
+          exporters: [otlp/jaeger]
+        
+        metrics:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [prometheus]

@@ -1,0 +1,13 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: zero-downtime-app
+spec:
+  host: zero-downtime-app
+  subsets:
+    - name: stable
+      labels:
+        app: zero-downtime-app
+    - name: canary
+      labels:
+        app: zero-downtime-app

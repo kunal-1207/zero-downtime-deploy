@@ -1,0 +1,20 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: zero-downtime-app
+spec:
+  hosts:
+    - "app.example.com"
+  gateways:
+    - zero-downtime-gateway
+  http:
+    - name: "primary"
+      route:
+        - destination:
+            host: zero-downtime-app
+            subset: stable
+          weight: 100
+        - destination:
+            host: zero-downtime-app
+            subset: canary
+          weight: 0

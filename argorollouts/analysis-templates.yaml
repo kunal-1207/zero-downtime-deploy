@@ -1,0 +1,63 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: success-rate
+spec:
+  args:
+    - name: service-name
+    - name: namespace
+  metrics:
+    - name: success-rate
+      interval: 1m
+      count: 5
+      # PromQL to measure success rate
+      provider:
+        prometheus:
+          address: http://prometheus-operator-prometheus.prometheus.svc:9090
+          query: |
+            sum(rate(http_requests_total{job="{{args.service-name}}", namespace="{{args.namespace}}", status=~"2.."}[5m]))
+            /
+            sum(rate(http_requests_total{job="{{args.service-name}}", namespace="{{args.namespace}}"}[5m]))
+      successCondition: result[0] >= 0.95
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: latency
+spec:
+  args:
+    - name: service-name
+    - name: namespace
+  metrics:
+    - name: latency
+      interval: 1m
+      count: 5
+      # PromQL to measure 95th percentile latency
+      provider:
+        prometheus:
+          address: http://prometheus-operator-prometheus.prometheus.svc:9090
+          query: |
+            histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job="{{args.service-name}}", namespace="{{args.namespace}}"}[5m])) by (le))
+      successCondition: result[0] <= 1.0
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: error-rate
+spec:
+  args:
+    - name: service-name
+    - name: namespace
+  metrics:
+    - name: error-rate
+      interval: 1m
+      count: 5
+      # PromQL to measure error rate
+      provider:
+        prometheus:
+          address: http://prometheus-operator-prometheus.prometheus.svc:9090
+          query: |
+            sum(rate(http_requests_total{job="{{args.service-name}}", namespace="{{args.namespace}}", status=~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total{job="{{args.service-name}}", namespace="{{args.namespace}}"}[5m]))
+      successCondition: result[0] <= 0.05

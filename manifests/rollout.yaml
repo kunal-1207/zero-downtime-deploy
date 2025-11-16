@@ -1,0 +1,54 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: zero-downtime-app
+spec:
+  replicas: 3
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: zero-downtime-app
+  template:
+    metadata:
+      labels:
+        app: zero-downtime-app
+    spec:
+      containers:
+        - name: zero-downtime-app
+          image: nginx:1.19-alpine
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 250m
+            limits:
+              memory: 128Mi
+              cpu: 500m
+          envFrom:
+            - configMapRef:
+                name: zero-downtime-config
+            - secretRef:
+                name: zero-downtime-secrets
+  strategy:
+    canary:
+      steps:
+        - setWeight: 20
+        - pause: {duration: 60s}
+        - setWeight: 40
+        - pause: {}
+        - setWeight: 60
+        - pause: {duration: 60s}
+        - setWeight: 80
+        - pause: {duration: 60s}
+      analysis:
+        templates:
+          - templateName: success-rate
+          - templateName: latency
+        startingStep: 2
+      trafficRouting:
+        istio:
+          virtualService:
+            name: zero-downtime-app
+            routes:
+              - primary

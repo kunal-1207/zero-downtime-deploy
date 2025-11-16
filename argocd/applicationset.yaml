@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: zero-downtime-appset
+  namespace: argocd
+spec:
+  generators:
+    # Generate applications for dev, staging, and prod environments
+    - list:
+        elements:
+          - env: dev
+            cluster: in-cluster
+            namespace: app-dev
+            server: https://kubernetes.default.svc
+          - env: staging
+            cluster: in-cluster
+            namespace: app-staging
+            server: https://kubernetes.default.svc
+          - env: prod
+            cluster: production-cluster
+            namespace: app-prod
+            server: https://production-cluster-api-url
+  
+  template:
+    metadata:
+      name: 'zero-downtime-app-{{env}}'
+    spec:
+      project: default
+      
+      source:
+        repoURL: https://github.com/example/zero-downtime-deployment.git
+        targetRevision: HEAD
+        path: kustomize/{{env}}
+        
+      destination:
+        server: '{{server}}'
+        namespace: '{{namespace}}'
+        
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          
+      ignoreDifferences:
+        - group: apps
+          kind: Deployment
+          jsonPointers:
+            - /spec/replicas

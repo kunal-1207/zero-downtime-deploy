@@ -1,0 +1,61 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: zero-downtime-app
+  description: A zero-downtime deployment system using ArgoCD, Argo Rollouts, Istio, and Prometheus
+  annotations:
+    github.com/project-slug: example/zero-downtime-deployment
+    backstage.io/techdocs-ref: dir:.
+  tags:
+    - kubernetes
+    - argocd
+    - argo-rollouts
+    - istio
+    - prometheus
+    - gitops
+spec:
+  type: service
+  lifecycle: production
+  owner: platform-team
+  system: deployment-platform
+  dependsOn:
+    - resource:argocd
+    - resource:argo-rollouts
+    - resource:istio
+    - resource:prometheus
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: argocd
+  description: GitOps tool for continuous deployment
+spec:
+  type: tool
+  owner: platform-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: argo-rollouts
+  description: Progressive delivery tool for advanced deployment strategies
+spec:
+  type: tool
+  owner: platform-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: istio
+  description: Service mesh for traffic management and observability
+spec:
+  type: tool
+  owner: platform-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: prometheus
+  description: Monitoring and alerting toolkit
+spec:
+  type: tool
+  owner: platform-team

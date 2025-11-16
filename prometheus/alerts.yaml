@@ -1,0 +1,45 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: zero-downtime-app-alerts
+  labels:
+    app: zero-downtime-app
+    release: prometheus
+spec:
+  groups:
+    - name: zero-downtime-app.rules
+      rules:
+        # High error rate alert
+        - alert: HighErrorRate
+          expr: |
+            sum(rate(http_requests_total{job="zero-downtime-app", status=~"5.."}[5m])) / 
+            sum(rate(http_requests_total{job="zero-downtime-app"}[5m])) > 0.05
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High error rate for {{ $labels.job }}"
+            description: "{{ $value }}% of requests to {{ $labels.job }} are failing"
+            
+        # High latency alert
+        - alert: HighLatency
+          expr: |
+            histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job="zero-downtime-app"}[5m])) by (le)) > 1
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High latency for {{ $labels.job }}"
+            description: "95th percentile latency for {{ $labels.job }} is {{ $value }} seconds"
+            
+        # Low success rate alert
+        - alert: LowSuccessRate
+          expr: |
+            sum(rate(http_requests_total{job="zero-downtime-app", status=~"2.."}[5m])) / 
+            sum(rate(http_requests_total{job="zero-downtime-app"}[5m])) < 0.95
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Low success rate for {{ $labels.job }}"
+            description: "Success rate for {{ $labels.job }} is {{ $value }}%"
