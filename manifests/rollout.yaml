@@ -30,10 +30,10 @@ spec:
                 name: zero-downtime-config
             - secretRef:
                 name: zero-downtime-secrets
-  strategy:
-    canary:
-      stableService: zero-downtime-app-stable   # ✅ Added stable service
-      canaryService: zero-downtime-app         # ✅ Existing canary service
+strategy:
+  canary:
+    stableService: zero-downtime-app-stable
+    canaryService: zero-downtime-app
       steps:
         - setWeight: 20
         - pause: {duration: 60s}
