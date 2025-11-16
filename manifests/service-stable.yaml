@@ -1,3 +1,4 @@
+# manifests/service-stable.yaml
 apiVersion: v1
 kind: Service
 metadata:
