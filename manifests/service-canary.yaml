@@ -2,13 +2,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: zero-downtime-app
+  name: zero-downtime-app-canary
   labels:
     app: zero-downtime-app
 spec:
   ports:
-    - name: http
-      port: 80
-      targetPort: 8081
+    - port: 80
+      targetPort: 8082
   selector:
     app: zero-downtime-app
